@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Jogo da Velha Online</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="login">
+    <h2>Login</h2>
+    <input id="username" placeholder="Usuário">
+    <input id="password" type="password" placeholder="Senha">
+    <button onclick="login()">Entrar</button>
+    <button onclick="register()">Registrar</button>
+</div>
+
+<div id="game" style="display:none;">
+    <h2 id="playerName"></h2>
+    <p>Troféus: <span id="trophies"></span></p>
+    <button onclick="findMatch()">Procurar partida</button>
+    <div id="board"></div>
+</div>
+
+<h3>Ranking Global</h3>
+<ul id="ranking"></ul>
+
+<script src="game.js"></script>
+</body>
+</html>
