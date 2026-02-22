@@ -67,8 +67,9 @@ app.get("/ranking", (req, res) => {
     res.json(ranking);
 });
 
-const server = app.listen(3000, () =>
-    console.log("Servidor rodando na porta 3000")
+const PORT = process.env.PORT || 3000;
+const server = app.listen(PORT, () =>
+    console.log("Servidor rodando na porta " + PORT)
 );
 
 const wss = new WebSocket.Server({ server });
@@ -112,11 +113,12 @@ wss.on("connection", (ws) => {
 
             if (data.winner && db.users[data.winner]) {
                 db.users[data.winner].trophies += 30;
-                if (db.users[data.loser]) {
-                    db.users[data.loser].trophies -= 15;
-                    if (db.users[data.loser].trophies < 0)
-                        db.users[data.loser].trophies = 0;
-                }
+            }
+
+            if (data.loser && db.users[data.loser]) {
+                db.users[data.loser].trophies -= 15;
+                if (db.users[data.loser].trophies < 0)
+                    db.users[data.loser].trophies = 0;
             }
 
             saveDB(db);

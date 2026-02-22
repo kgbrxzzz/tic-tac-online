@@ -1,9 +1,12 @@
-let token;
 let username;
 let socket;
 let board = Array(9).fill(null);
 let myTurn = false;
 let mySymbol = null;
+
+const usernameInput = document.getElementById("username");
+const passwordInput = document.getElementById("password");
+const loginMsg = document.getElementById("loginMsg");
 
 function register() {
     fetch("/register", {
@@ -11,9 +14,11 @@ function register() {
         headers: {"Content-Type":"application/json"},
         body: JSON.stringify({
             username: usernameInput.value,
-            password: password.value
+            password: passwordInput.value
         })
-    }).then(r => r.text()).then(alert);
+    })
+    .then(r => r.text())
+    .then(msg => loginMsg.innerText = msg);
 }
 
 function login() {
@@ -22,26 +27,30 @@ function login() {
         headers: {"Content-Type":"application/json"},
         body: JSON.stringify({
             username: usernameInput.value,
-            password: password.value
+            password: passwordInput.value
         })
     })
     .then(r => r.json())
     .then(data => {
-        token = data.token;
         username = usernameInput.value;
+
         document.getElementById("trophies").innerText = data.trophies;
-        document.getElementById("login").style.display = "none";
-        document.getElementById("game").style.display = "block";
-        document.getElementById("playerName").innerText = username;
+        document.getElementById("playerName").innerText = "👤 " + username;
+
+        document.getElementById("loginBox").classList.add("hidden");
+        document.getElementById("gameBox").classList.remove("hidden");
+
         loadRanking();
-    });
+    })
+    .catch(() => loginMsg.innerText = "Erro no login");
 }
 
 function findMatch() {
-    socket = new WebSocket("ws://" + location.host);
+    socket = new WebSocket((location.protocol === "https:" ? "wss://" : "ws://") + location.host);
 
     socket.onopen = () => {
         socket.send(JSON.stringify({ type: "join", username }));
+        document.getElementById("status").innerText = "Procurando jogador...";
     };
 
     socket.onmessage = (msg) => {
@@ -50,6 +59,8 @@ function findMatch() {
         if (data.type === "start") {
             mySymbol = data.symbol;
             myTurn = mySymbol === "X";
+            document.getElementById("status").innerText =
+                myTurn ? "Sua vez!" : "Vez do adversário";
             createBoard();
         }
 
@@ -57,6 +68,8 @@ function findMatch() {
             board[data.index] = mySymbol === "X" ? "O" : "X";
             updateBoard();
             myTurn = true;
+            document.getElementById("status").innerText = "Sua vez!";
+            checkGame();
         }
     };
 }
@@ -81,7 +94,8 @@ function play(i) {
     socket.send(JSON.stringify({ type: "move", index: i }));
     updateBoard();
     myTurn = false;
-    checkWin();
+    document.getElementById("status").innerText = "Vez do adversário";
+    checkGame();
 }
 
 function updateBoard() {
@@ -90,7 +104,7 @@ function updateBoard() {
     });
 }
 
-function checkWin() {
+function checkGame() {
     const wins = [
         [0,1,2],[3,4,5],[6,7,8],
         [0,3,6],[1,4,7],[2,5,8],
@@ -100,14 +114,30 @@ function checkWin() {
     for (let combo of wins) {
         const [a,b,c] = combo;
         if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+
+            const winner = board[a] === mySymbol ? username : null;
+
             socket.send(JSON.stringify({
                 type: "result",
-                winner: username,
-                loser: "opponent"
+                winner: winner,
+                loser: winner ? null : username
             }));
-            alert("Você venceu!");
+
+            alert(winner ? "🎉 Você venceu!" : "😢 Você perdeu!");
+            resetGame();
+            return;
         }
     }
+
+    if (!board.includes(null)) {
+        alert("Empate!");
+        resetGame();
+    }
+}
+
+function resetGame() {
+    board = Array(9).fill(null);
+    createBoard();
 }
 
 function loadRanking() {
@@ -118,7 +148,7 @@ function loadRanking() {
         list.innerHTML = "";
         data.forEach(player => {
             const li = document.createElement("li");
-            li.innerText = player.username + " - " + player.trophies;
+            li.innerText = player.username + " - " + player.trophies + "🏆";
             list.appendChild(li);
         });
     });

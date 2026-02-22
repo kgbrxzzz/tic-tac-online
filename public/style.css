@@ -1,29 +1,74 @@
 body {
-    background: #1e1e2f;
-    color: white;
+    background: linear-gradient(135deg,#141e30,#243b55);
     font-family: Arial;
     text-align: center;
+    color: white;
+    margin: 0;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    margin-top: 80px;
+}
+
+.card {
+    background: #1e1e2f;
+    padding: 30px;
+    border-radius: 15px;
+    width: 300px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: none;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    background: #4CAF50;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button.secondary {
+    background: #555;
+}
+
+.hidden {
+    display: none;
 }
 
 #board {
     display: grid;
-    grid-template-columns: repeat(3, 100px);
+    grid-template-columns: repeat(3, 80px);
     gap: 5px;
-    margin: 20px auto;
+    justify-content: center;
+    margin-top: 20px;
 }
 
 .cell {
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
     background: #2e2e4f;
-    font-size: 40px;
+    font-size: 35px;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     cursor: pointer;
+    border-radius: 10px;
 }
 
-button {
-    padding: 10px;
-    margin: 5px;
+#status {
+    margin-top: 10px;
+    font-weight: bold;
 }
